@@ -23,13 +23,7 @@ export default function App() {
 
   const removeItemFromList = (id)=>{
     let list = [...items];
-    console.log(list,id);
-    if(list.length == 1 ){
-      list = [];
-    }
-    else{
-      list.splice(id,1);
-    }
+    list.splice(id,1);
     setItems(list);
   }
 
@@ -37,15 +31,9 @@ export default function App() {
 
     let list = [...items];
     let holdElement = {};
-  
     list[id].isCompleted = 1;
     holdElement = list[id];
-    if(list.length == 1 ){
-      list = [];
-    }
-    else{
-      list.splice(id,1);
-    }
+    list.splice(id,1);
     list.push(holdElement)
     setItems(list);
 
@@ -71,7 +59,7 @@ export default function App() {
                   value="first"
                   color={Colors.cyan500}
                   status={ data.isCompleted == 1 ? 'checked' : 'unchecked' }
-                  onPress={() => {taskCompleted(data.id);setChecked('first');}}
+                  onPress={() => {taskCompleted(i);setChecked('first');}}
                   style={{alignItems:"flex-start",color:"red"}}
                   key={1000+i}
               />
@@ -81,7 +69,7 @@ export default function App() {
                   icon="delete"
                   color={Colors.red500}
                   size={20}
-                  onPress={() => {removeItemFromList(data.id);console.log('Pressed');}}
+                  onPress={() => {removeItemFromList(i);console.log('Pressed');}}
                   style={{alignItems:"flex-end"}}
                   key={i+2000}
               />
