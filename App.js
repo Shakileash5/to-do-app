@@ -1,6 +1,8 @@
 import { StatusBar } from 'expo-status-bar';
-import React,{useState} from 'react';
+import React,{useState,useEffect} from 'react';
+import { render } from 'react-dom';
 import { StyleSheet, Text, View,TextInput,Dimensions,Button } from 'react-native';
+import { DefaultTheme,IconButton, Colors,RadioButton  } from 'react-native-paper';
 import Tasks from './tasks';
 
 export default function App() {
@@ -8,18 +10,50 @@ export default function App() {
   const [focused,setFocused] = useState(0);
   const [items,setItems] = useState([]);
   const [inputText,setText] = useState("");
+  const [checked, setChecked] = React.useState('second');
   
   const addItemToList = ()=>{
-    let temp = {items:inputText,isCompleted:0};
     //setItems([...items,temp]);
     let list = items
-    list.push({id:list.length,text:inputText})
+    list.push({id:list.length,text:inputText,isCompleted:0})
     setItems(list);
     setText('');
 
   }
 
-  return (
+  const removeItemFromList = (id)=>{
+    let list = [...items];
+    console.log(list,id);
+    if(list.length == 1 ){
+      list = [];
+    }
+    else{
+      list.splice(id,1);
+    }
+    setItems(list);
+  }
+
+  const taskCompleted = (id)=>{
+
+    let list = [...items];
+    let holdElement = {};
+  
+    list[id].isCompleted = 1;
+    holdElement = list[id];
+    if(list.length == 1 ){
+      list = [];
+    }
+    else{
+      list.splice(id,1);
+    }
+    list.push(holdElement)
+    setItems(list);
+
+  }
+
+
+
+   return (
     <View style={styles.container}>
       <View style={styles.addItem}>
         <TextInput style={focused?styles.addTextFocused:styles.addText} onChangeText={(text)=>{setText(text);}} onFocus={()=>setFocused(1)} value={inputText} onBlur={()=>setFocused(0)} placeholder="Enter the item!"></TextInput>
@@ -27,12 +61,31 @@ export default function App() {
       </View> 
       
       <View style={styles.cardView}>
-        <Tasks />
       {items.map((data,i)=>{
         //console.log("see",data.id,data.text);
         
         return( 
-        <Text key={i} style={styles.item}>{data.text}</Text>
+        //<Text key={i} style={styles.item}>{data.text}</Text>
+          <View style={data.isCompleted == 0 ?styles.itemView:styles.itemViewCompleted}>
+              <RadioButton
+                  value="first"
+                  color={Colors.cyan500}
+                  status={ data.isCompleted == 1 ? 'checked' : 'unchecked' }
+                  onPress={() => {taskCompleted(data.id);setChecked('first');}}
+                  style={{alignItems:"flex-start",color:"red"}}
+                  key={1000+i}
+              />
+              <Text key={data.id} style={data.isCompleted == 0 ?styles.item:styles.itemCompleted}>{data.text}</Text>
+              
+              <IconButton
+                  icon="delete"
+                  color={Colors.red500}
+                  size={20}
+                  onPress={() => {removeItemFromList(data.id);console.log('Pressed');}}
+                  style={{alignItems:"flex-end"}}
+                  key={i+2000}
+              />
+          </View>
         );
       })}
       </View>
@@ -85,10 +138,38 @@ const styles = StyleSheet.create({
   item: {
     color:"white",
     padding:10,
+    width:'100%',
     borderRadius:10,
+    marginBottom:5,
+  },
+  itemView: {
+    padding:0,
+    width:'100%',
+    flexDirection:"row",
     backgroundColor: '#2E2E2E',
     borderBottomWidth:2,
     borderBottomColor:"purple",
+    borderColor:"grey",
+    borderRadius:10,
     marginBottom:5,
-  }
+  },
+  itemCompleted: {
+    color:"grey",
+    textDecorationLine: 'line-through',
+    padding:10,
+    width:'100%',
+    borderRadius:10,
+    marginBottom:5,
+  },
+  itemViewCompleted: {
+    padding:0,
+    width:'100%',
+    flexDirection:"row",
+    backgroundColor: '#2E2E2E',
+    borderBottomWidth:2,
+    borderBottomColor:"green",
+    borderColor:"grey",
+    borderRadius:10,
+    marginBottom:5,
+  },
 });

@@ -6,7 +6,7 @@ import { DefaultTheme,IconButton, Colors,RadioButton  } from 'react-native-paper
 function Tasks(){
     const [checked, setChecked] = React.useState('second');
     return (
-        <View style={styles.cardView}>
+        <View style={styles.itemView}>
             <RadioButton
                 value="first"
                 color={Colors.cyan500}
@@ -35,7 +35,7 @@ const styles = StyleSheet.create({
         borderRadius:5,
         
       },
-      cardView: {
+      itemView: {
         padding:0,
         width:'100%',
         flexDirection:"row",
