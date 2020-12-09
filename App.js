@@ -61,58 +61,66 @@ function App() {
 
    return (
     <View style={styles.container}> 
-        
-      <View style={styles.cardView}>
-      {  
-        <View style={show==1?styles.getItemsCard:{display:"none"}} ref={createItemNode} >
-          <Text style={{color:"white",fontWeight:"bold",padding:5,}}>Add an item</Text>
-            <TextInput style={focused?styles.addTextFocused:styles.addText} onChangeText={(text)=>{setText(text);}} onFocus={()=>setFocused(1)} value={inputText} onBlur={()=>setFocused(0)} placeholder="Enter the item!"></TextInput>
-            <View style={{alignSelf:"flex-end"}}>
-              <Button title="Add" style={{alignSelf:"flex-end"}} onPress={()=>addItemToList()}></Button>
+
+        <Text style={{color:"white",fontWeight:"bold",alignSelf:"flex-start"}}>Todo's Category</Text>
+        <View style={{flexDirection:"row"}}> 
+            <View style={{backgroundColor:"#2E2E2E",borderRadius:10,flexDirection:"Column",padding:10}}>
+              <Text style={{color:"white",fontWeight:"bold"}}>Bussiness</Text>
             </View>
-        </View>
+        </View>   
+
+        <Text style={{color:"white",fontWeight:"bold",alignSelf:"flex-start"}}>Todo's list</Text>
+        <View style={styles.cardView}>
+          {  
+            <View style={show==1?styles.getItemsCard:{display:"none"}} ref={createItemNode} >
+              <Text style={{color:"white",fontWeight:"bold",padding:5,}}>Add an item</Text>
+                <TextInput style={focused?styles.addTextFocused:styles.addText} onChangeText={(text)=>{setText(text);}} onFocus={()=>setFocused(1)} value={inputText} onBlur={()=>setFocused(0)} placeholder="Enter the item!"></TextInput>
+                <View style={{alignSelf:"flex-end"}}>
+                  <Button title="Add" style={{alignSelf:"flex-end"}} onPress={()=>addItemToList()}></Button>
+                </View>
+            </View>
+            
+          }
+          {items.map((data,i)=>{
+            //console.log("see",data.id,data.text);
+          
+          return( 
+          //<Text key={i} style={styles.item}>{data.text}</Text>
+            <View style={data.isCompleted == 0 ?styles.itemView:styles.itemViewCompleted}>
+                <RadioButton
+                    value="first"
+                    color={Colors.cyan500}
+                    status={ data.isCompleted == 1 ? 'checked' : 'unchecked' }
+                    onPress={() => {taskCompleted(i);}}
+                    style={{alignItems:"flex-start",color:"red"}}
+                    key={1000+i}
+                />
+                <Text key={data.id} style={data.isCompleted == 0 ?styles.item:styles.itemCompleted}>{data.text}</Text>
+                
+                <IconButton
+                    icon="delete"
+                    color={Colors.red500}
+                    size={20}
+                    onPress={() => {removeItemFromList(i);console.log('Pressed');}}
+                    style={{alignItems:"flex-end"}}
+                    key={i+2000}
+                />
+            </View>
+          );
+        })}
         
-      }
-      {items.map((data,i)=>{
-        //console.log("see",data.id,data.text);
-        
-        return( 
-        //<Text key={i} style={styles.item}>{data.text}</Text>
-          <View style={data.isCompleted == 0 ?styles.itemView:styles.itemViewCompleted}>
-              <RadioButton
-                  value="first"
-                  color={Colors.cyan500}
-                  status={ data.isCompleted == 1 ? 'checked' : 'unchecked' }
-                  onPress={() => {taskCompleted(i);}}
-                  style={{alignItems:"flex-start",color:"red"}}
-                  key={1000+i}
-              />
-              <Text key={data.id} style={data.isCompleted == 0 ?styles.item:styles.itemCompleted}>{data.text}</Text>
-              
-              <IconButton
-                  icon="delete"
-                  color={Colors.red500}
-                  size={20}
-                  onPress={() => {removeItemFromList(i);console.log('Pressed');}}
-                  style={{alignItems:"flex-end"}}
-                  key={i+2000}
-              />
-          </View>
-        );
-      })}
-      
       </View>
-      <Text style={{color:"#2069e0"}}>Complete the tasks!{items.text}</Text>
+
       <IconButton 
-      icon="pencil" 
-      color={Colors.green500} 
-      style={{alignSelf:"flex-end",position:'absolute',zIndex:1,bottom:10,}}  
-      onPress={()=>{setShow(1);}}
-      size={40}>
-      
+        icon="pencil" 
+        color={Colors.green500} 
+        style={{alignSelf:"flex-end",position:'absolute',zIndex:1,bottom:10,}}  
+        onPress={()=>{setShow(1);}}
+        size={40}>
+        
       </IconButton>
       <StatusBar style="auto" />
-    </View>
+  </View>
   );
 }
 
