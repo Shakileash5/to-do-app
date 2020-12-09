@@ -1,16 +1,18 @@
 import { StatusBar } from 'expo-status-bar';
-import React,{useState,useEffect} from 'react';
+import React,{useState,useEffect,useRef} from 'react';
 import { render } from 'react-dom';
 import { StyleSheet, Text, View,TextInput,Dimensions,Button } from 'react-native';
 import { DefaultTheme,IconButton, Colors,RadioButton  } from 'react-native-paper';
+import { AppRegistry } from 'react-native';
 import Tasks from './tasks';
 
-export default function App() {
+function App() {
   const {height,width} = Dimensions.get('window');
   const [focused,setFocused] = useState(0);
   const [items,setItems] = useState([]);
   const [inputText,setText] = useState("");
-  const [checked, setChecked] = React.useState('second');
+  const [show, setShow] = React.useState(0);
+  const createItemNode = useRef();
   
   const addItemToList = ()=>{
     //setItems([...items,temp]);
@@ -18,6 +20,7 @@ export default function App() {
     list.push({id:list.length,text:inputText,isCompleted:0})
     setItems(list);
     setText('');
+    setShow(0);
 
   }
 
@@ -39,16 +42,37 @@ export default function App() {
 
   }
 
+  const handleClick = (e)=>{
+    if(!createItemNode.current.contains(e.target)){
+      setShow(0);
+      return;
+    }
 
+  }
+
+  useEffect(()=>{
+    document.addEventListener("mousedown", handleClick);
+    return () => {
+      document.removeEventListener("mousedown", handleClick);
+    };
+  },[show]);
+
+  
 
    return (
-    <View style={styles.container}>
-      <View style={styles.addItem}>
-        <TextInput style={focused?styles.addTextFocused:styles.addText} onChangeText={(text)=>{setText(text);}} onFocus={()=>setFocused(1)} value={inputText} onBlur={()=>setFocused(0)} placeholder="Enter the item!"></TextInput>
-        <Button title="Add" onPress={()=>addItemToList()}></Button>
-      </View> 
-      
+    <View style={styles.container}> 
+        
       <View style={styles.cardView}>
+      {  
+        <View style={show==1?styles.getItemsCard:{display:"none"}} ref={createItemNode} >
+          <Text style={{color:"white",fontWeight:"bold",padding:5,}}>Add an item</Text>
+            <TextInput style={focused?styles.addTextFocused:styles.addText} onChangeText={(text)=>{setText(text);}} onFocus={()=>setFocused(1)} value={inputText} onBlur={()=>setFocused(0)} placeholder="Enter the item!"></TextInput>
+            <View style={{alignSelf:"flex-end"}}>
+              <Button title="Add" style={{alignSelf:"flex-end"}} onPress={()=>addItemToList()}></Button>
+            </View>
+        </View>
+        
+      }
       {items.map((data,i)=>{
         //console.log("see",data.id,data.text);
         
@@ -59,7 +83,7 @@ export default function App() {
                   value="first"
                   color={Colors.cyan500}
                   status={ data.isCompleted == 1 ? 'checked' : 'unchecked' }
-                  onPress={() => {taskCompleted(i);setChecked('first');}}
+                  onPress={() => {taskCompleted(i);}}
                   style={{alignItems:"flex-start",color:"red"}}
                   key={1000+i}
               />
@@ -76,8 +100,17 @@ export default function App() {
           </View>
         );
       })}
+      
       </View>
       <Text style={{color:"#2069e0"}}>Complete the tasks!{items.text}</Text>
+      <IconButton 
+      icon="pencil" 
+      color={Colors.green500} 
+      style={{alignSelf:"flex-end",position:'absolute',zIndex:1,bottom:10,}}  
+      onPress={()=>{setShow(1);}}
+      size={40}>
+      
+      </IconButton>
       <StatusBar style="auto" />
     </View>
   );
@@ -90,29 +123,31 @@ const styles = StyleSheet.create({
     flexDirection:"Column",
     backgroundColor: '#1E1E1E',
     alignItems: 'center',
+    zIndex:0,
     //justifyContent: 'center',
     color:'#fff',
   },
   addItem: {
     padding:10,
-    flexDirection:"row",
+    flexDirection:"column",
     justifyContent:"space-between",
   },
   addText: {
     color: "white",
     width: "100%",
-    borderColor: "white",
-    borderWidth: 1,
+    borderColor: "#03DAC5",
+    borderBottomWidth: 1,
     padding: 10,
     marginRight:10,
+    marginBottom:10,
   },
   addTextFocused: {
     color: "white",
     width: "100%",
-    borderColor: "blue",
-    borderWidth: 1,
+    borderColor: "purple",
+    borderBottomWidth: 1,
     padding: 10,
-    marginRight:10,
+    marginBottom:10,
   },
   cardView: {
     padding:10,
@@ -160,4 +195,19 @@ const styles = StyleSheet.create({
     borderRadius:10,
     marginBottom:5,
   },
+  getItemsCard: {
+
+    backgroundColor:"#3F3F3F",
+    position:"absolute",
+    zIndex:1,
+    flexDirection:"Column",
+    alignItems:"flex-start",
+    alignSelf:"center",
+    borderRadius:10,
+    padding:20,
+  },
 });
+
+AppRegistry.registerComponent('Todo-list-app', () => 'App');
+
+export default App;
