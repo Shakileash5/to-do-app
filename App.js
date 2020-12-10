@@ -1,8 +1,8 @@
 import { StatusBar } from 'expo-status-bar';
 import React,{useState,useEffect,useRef} from 'react';
 import { render } from 'react-dom';
-import { StyleSheet, Text, View,TextInput,Dimensions,Button } from 'react-native';
-import { DefaultTheme,IconButton, Colors,RadioButton  } from 'react-native-paper';
+import { StyleSheet, Text, View,TextInput,Dimensions,Button,ScrollView } from 'react-native';
+import { DefaultTheme,IconButton, Colors,RadioButton,ProgressBar  } from 'react-native-paper';
 import { AppRegistry } from 'react-native';
 import Tasks from './tasks';
 
@@ -61,12 +61,18 @@ function App() {
 
    return (
     <View style={styles.container}> 
-
         <Text style={{color:"white",fontWeight:"bold",alignSelf:"flex-start"}}>Todo's Category</Text>
-        <View style={{flexDirection:"row"}}> 
-            <View style={{backgroundColor:"#2E2E2E",borderRadius:10,flexDirection:"Column",padding:10}}>
-              <Text style={{color:"white",fontWeight:"bold"}}>Bussiness</Text>
-            </View>
+        <View style={{flexDirection:"row",width:"100%",padding:10}}> 
+            <View style={{backgroundColor:"#2E2E2E",borderRadius:20,flexDirection:"Column",padding:20,width:"50%",height:"100%"}}>
+              <Text style={{color:"grey",fontWeight:"bold",fontSize:10}}>40 Tasks</Text>
+              <Text style={{color:"white",fontWeight:"bold",paddingBottom:20}}>Bussiness</Text>
+              <ProgressBar progress={0.7} style={{color:"green",}}></ProgressBar>
+            </View>    
+            <View style={{backgroundColor:"#2E2E2E",borderRadius:20,flexDirection:"Column",padding:20,width:"50%",height:"100%"}}>
+              <Text style={{color:"grey",fontWeight:"bold",fontSize:10}}>40 Tasks</Text>
+              <Text style={{color:"white",fontWeight:"bold",paddingBottom:20}}>Bussiness</Text>
+              <ProgressBar progress={0.7} style={{color:"green",}}></ProgressBar>
+            </View> 
         </View>   
 
         <Text style={{color:"white",fontWeight:"bold",alignSelf:"flex-start"}}>Todo's list</Text>
@@ -174,14 +180,14 @@ const styles = StyleSheet.create({
     marginBottom:5,
   },
   itemView: {
-    padding:0,
+    padding:10,
     width:'100%',
     flexDirection:"row",
     backgroundColor: '#2E2E2E',
-    borderBottomWidth:2,
+    borderBottomWidth:0,
     borderBottomColor:"purple",
     borderColor:"grey",
-    borderRadius:10,
+    borderRadius:15,
     marginBottom:5,
   },
   itemCompleted: {
@@ -193,14 +199,14 @@ const styles = StyleSheet.create({
     marginBottom:5,
   },
   itemViewCompleted: {
-    padding:0,
+    padding:10,
     width:'100%',
     flexDirection:"row",
     backgroundColor: '#2E2E2E',
     borderBottomWidth:2,
     borderBottomColor:"green",
     borderColor:"grey",
-    borderRadius:10,
+    borderRadius:15,
     marginBottom:5,
   },
   getItemsCard: {
