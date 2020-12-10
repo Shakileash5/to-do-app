@@ -4,6 +4,7 @@ import { render } from 'react-dom';
 import { StyleSheet, Text, View,TextInput,Dimensions,Button,ScrollView,SafeAreaView } from 'react-native';
 import { DefaultTheme,IconButton, Colors,RadioButton,ProgressBar  } from 'react-native-paper';
 import { AppRegistry } from 'react-native';
+//import Carousel from 'react-native-snap-carousel';
 import Tasks from './tasks';
 
 function App() {
@@ -57,7 +58,6 @@ function App() {
     };
   },[show]);
 
-  
 
    return (
      
@@ -65,19 +65,48 @@ function App() {
 
         <Text style={{color:"white",fontWeight:"bold",alignSelf:"flex-start"}}>Todo's Category</Text>
         <SafeAreaView style={styles.container1}>
-            <ScrollView horizontal={true} showsHorizontalScrollIndicator={false} scrollEventThrottle={200} decelerationRate="fast"> 
-                <View style={{backgroundColor:"#2E2E2E",borderRadius:20,flexDirection:"Column",padding:20,width:"50%",height:"100%"}}>
-                  <Text style={{color:"grey",fontWeight:"bold",fontSize:10}}>40 Tasks</Text>
-                  <Text style={{color:"white",fontWeight:"bold",paddingBottom:20}}>Bussiness</Text>
-                  <ProgressBar progress={0.7} style={{color:"green",}}></ProgressBar>
-                </View>    
-                <View style={{backgroundColor:"#2E2E2E",borderRadius:20,flexDirection:"Column",padding:20,width:"50%",height:"100%"}}>
-                  <Text style={{color:"grey",fontWeight:"bold",fontSize:10}}>40 Tasks</Text>
-                  <Text style={{color:"white",fontWeight:"bold",paddingBottom:20}}>Bussiness</Text>
-                  <ProgressBar progress={0.7} style={{color:"green",}}></ProgressBar>
-                </View>   
-            </ScrollView>  
+          <ScrollView
+          scrollEventThrottle = {16}>
+            <View style={{flex:1,paddingTop:20}}>
+            <ScrollView horizontal={true} nestedScrollEnabled={true}  showsHorizontalScrollIndicator={false}>
+                  <View 
+                  style={{height:130,width:130,marginLeft:20,borderWidth:0.4,borderColor:"#dddddd"}} >
+                    <View style={{flex:2}}>
+                        <Text style={{flex:1}}>the imagecomes here omg!</Text>
+                    </View>
+                    <View style={{flex:1}}>
+                        <Text>Bussiness</Text>
+                    </View>
+                  </View>
+                  <View style={{height:130,width:130,marginLeft:20,borderWidth:0.4,borderColor:"#dddddd"}} >
+                    <View style={{flex:2}}>
+                        <Text style={{flex:1}}>the imagecomes herg!</Text>
+                    </View>
+                    <View style={{flex:1}}>
+                        <Text>Bussiness</Text>
+                    </View>
+                  </View> 
+                  <View style={{height:130,width:130,marginLeft:20,borderWidth:0.4,borderColor:"#dddddd"}} >
+                    <View style={{flex:2}}>
+                        <Text style={{flex:1}}>the imagecomes herg!</Text>
+                    </View>
+                    <View style={{flex:1}}>
+                        <Text>Bussiness</Text>
+                    </View>
+                  </View>   
+                </ScrollView>
+              <Text style={{fontSize:24,fontWeight:'700',paddingHorizontal:20}}>
+                lets see
+              </Text>
+              <View style={{height:130,marginTop:20}}>
+               
+              </View>
+            </View>
+            
+          </ScrollView>
+            
         </SafeAreaView>
+        
         <Text style={{color:"white",fontWeight:"bold",alignSelf:"flex-start"}}>Todo's list</Text>
         <View style={styles.cardView}>
           {  
@@ -139,7 +168,7 @@ const styles = StyleSheet.create({
     padding:10,
     flexDirection:"Column",
     backgroundColor: '#1E1E1E',
-    alignItems: 'center',
+    
     zIndex:0,
     //justifyContent: 'center',
     color:'#fff',
