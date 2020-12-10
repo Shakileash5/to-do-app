@@ -2,7 +2,7 @@ import { StatusBar } from 'expo-status-bar';
 import React,{useState,useEffect,useRef} from 'react';
 import { render } from 'react-dom';
 import { StyleSheet, Text, View,TextInput,Dimensions,Button,ScrollView,SafeAreaView } from 'react-native';
-import { DefaultTheme,IconButton, Colors,RadioButton,ProgressBar  } from 'react-native-paper';
+import { DefaultTheme, Provider as PaperProvider ,IconButton, Colors,RadioButton,ProgressBar  } from 'react-native-paper';
 import { AppRegistry } from 'react-native';
 //import Carousel from 'react-native-snap-carousel';
 import Category from './category';
@@ -14,15 +14,16 @@ function App() {
   const [inputText,setText] = useState("");
   const [show, setShow] = React.useState(0);
   const createItemNode = useRef();
-  
+
+
   const addItemToList = ()=>{
     //setItems([...items,temp]);
     let list = items
     list.push({id:list.length,text:inputText,isCompleted:0})
+    
     setItems(list);
     setText('');
     setShow(0);
-
   }
 
   const removeItemFromList = (id)=>{
@@ -105,6 +106,7 @@ function App() {
                 <RadioButton
                     value="first"
                     color={Colors.cyan500}
+                    uncheckedColor={Colors.purple800}
                     status={ data.isCompleted == 1 ? 'checked' : 'unchecked' }
                     onPress={() => {taskCompleted(i);}}
                     style={{alignItems:"flex-start",color:"red"}}
@@ -125,7 +127,6 @@ function App() {
         })}
         
       </ScrollView>
-
       <StatusBar style="auto" />
   </View>
   );
@@ -169,7 +170,7 @@ const styles = StyleSheet.create({
     marginBottom:10,
   },
   cardView: {
-    padding:10,
+    padding:20,
     width:'90%',
     flexDirection:"Column",
     //backgroundColor: '#2E2E2E',
@@ -193,7 +194,7 @@ const styles = StyleSheet.create({
     borderBottomColor:"purple",
     borderColor:"grey",
     borderRadius:15,
-    marginBottom:5,
+    marginBottom:10,
   },
   itemCompleted: {
     color:"grey",
@@ -224,6 +225,7 @@ const styles = StyleSheet.create({
     alignSelf:"center",
     borderRadius:10,
     padding:20,
+    marginBottom:10,
   },
 });
 
