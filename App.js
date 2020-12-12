@@ -1,10 +1,8 @@
 import { StatusBar } from 'expo-status-bar';
 import React,{useState,useEffect,useRef} from 'react';
-import { render } from 'react-dom';
 import { StyleSheet, Text, View,TextInput,Dimensions,Button,ScrollView,SafeAreaView,TouchableOpacity } from 'react-native';
-import { DefaultTheme, Provider as PaperProvider ,IconButton, Colors,RadioButton,ProgressBar  } from 'react-native-paper';
+import {Provider as PaperProvider ,IconButton, Colors,RadioButton } from 'react-native-paper';
 import { AppRegistry } from 'react-native';
-//import Carousel from 'react-native-snap-carousel';
 import Category from './category';
 
 function App() {
@@ -19,14 +17,53 @@ function App() {
   const createItemNode = useRef();
 
 
+  const set_currentCategory = (Category)=>{
+    for(var key in todos){
+      
+      if(Category.toLowerCase()==key.toLowerCase()){
+          setItems(todos[key]);
+          console.log("set")
+      }
+    }
+  } 
+
+  const getCompletedPercent = (Category)=>{
+
+    var count = 0;
+    var len = 0;
+    for(var key in todos){
+      
+      if(Category.toLowerCase()==key.toLowerCase()){
+          len = todos[key].length;
+          todos[key].map((data)=>{
+            
+            if(data.isCompleted == 1){
+              count+=1;
+            }
+
+          });
+      }
+    }
+    return count/len;
+
+  }
+
   const addItemToList = ()=>{
     //setItems([...items,temp]);
     let listFull = todos;
+    let flag = 0;
     for(var key in listFull){
       if(inputCategory.toLowerCase()==key.toLowerCase()){
-        listFull[key].unshift({id:listFull.length,text:inputText,isCompleted:0});
+        listFull[key].unshift({id:listFull[key].length,text:inputText,isCompleted:0});
         setItems(listFull[key]);
+        flag=1;
       }
+    }
+
+    if(flag==0){
+      let text = inputCategory[0].toUpperCase()  + inputCategory.slice(1).toLowerCase();
+      console.log(text,"dd")
+      listFull[text] = [{id:0,text:inputText,isCompleted:0}]
     }
     setTodos(listFull);  
     setCurrentCategory(inputCategory);
@@ -42,8 +79,17 @@ function App() {
         let list = [...listFull[key]];
         list.splice(id,1);
         listFull[key] = [...list];
+        if(list.length==0){
+          if(key.toLowerCase()!="personal"){
+            delete listFull[key];
+            setCurrentCategory("Personal");
+            setItems([])
+          }
+        }
+        else{
+          setItems(listFull[key]);
+        }
         setTodos(listFull);
-        setItems(listFull[key]);
       }
     }
   }
@@ -82,6 +128,11 @@ function App() {
     };
   },[show]);
 
+  useEffect(()=>{
+    set_currentCategory(currentCategory);
+  },[currentCategory])
+
+
 
    return (
      
@@ -89,14 +140,18 @@ function App() {
 
         <Text style={{color:"white",fontWeight:"bold",alignSelf:"flex-start"}}>Todo's Category</Text>
         <SafeAreaView style={styles.container1}>
-            <View style={{flex:1,padding:20}}>
+            <View style={{flex:2,padding:20,}}>
               <ScrollView horizontal={true} nestedScrollEnabled={true}  showsHorizontalScrollIndicator={false}>
-                
-                    <TouchableOpacity style={{height:"100%",width:"40%",marginLeft:20,borderRadius:20,backgroundColor:"#2E2E2E",padding:10,}} onPress={()=>console.log("fefiwuehf")}>
-                      <Category todosNo="10" category="Business" progress="0.2" />
-                    </TouchableOpacity> 
-                    <Category todosNo="45" category="Personel" progress="0.6" />
-                    <Category todosNo="15" category="Others" progress="0.8" />           
+                {
+                  Object.keys(todos).map(function(key,i){      
+                    return(
+                    <TouchableOpacity style={{marginRight:15}} key={i} onPress={()=>set_currentCategory(key)}>
+                      <Category todosNo={todos[key].length} category={key} progress={getCompletedPercent(key)} />
+                    </TouchableOpacity>
+                     )
+                  })  
+                  
+                }        
               </ScrollView>
             </View>
           
@@ -118,7 +173,7 @@ function App() {
               <Text style={{color:"white",fontWeight:"bold",padding:5,}}>Add an item</Text>
                 <TextInput style={focused?styles.addTextFocused:styles.addText} onChangeText={(text)=>{setText(text);}} onFocus={()=>setFocused(1)} value={inputText} onBlur={()=>setFocused(0)} placeholder="Enter the item!"></TextInput>
                 <Text style={{color:"white",fontWeight:"bold",padding:5,}}>Add the Category</Text> 
-                <TextInput style={focused?styles.addTextFocused:styles.addText} onChangeText={(text)=>{setCategory(text);}} onFocus={()=>setFocused(1)} value={inputCategory} onBlur={()=>setFocused(0)} placeholder="Personel"></TextInput>
+                <TextInput style={focused?styles.addTextFocused:styles.addText} onChangeText={(text)=>{setCategory(text);}} onFocus={()=>setFocused(1)} value={inputCategory} onBlur={()=>setFocused(0)} placeholder="Personal"></TextInput>
                 <View style={{alignSelf:"flex-end"}}>
                   <Button title="Add" style={{alignSelf:"flex-end"}} onPress={()=>addItemToList()}></Button>
                 </View>
@@ -130,7 +185,7 @@ function App() {
           items.map((data,i)=>{
           return( 
           //<Text key={i} style={styles.item}>{data.text}</Text>
-            <View style={data.isCompleted == 0 ?styles.itemView:styles.itemViewCompleted}>
+            <View key ={i} style={data.isCompleted == 0 ?styles.itemView:styles.itemViewCompleted}>
                 <RadioButton
                     value="first"
                     color={Colors.cyan500}
@@ -140,13 +195,13 @@ function App() {
                     style={{alignItems:"flex-start",color:"red"}}
                     key={1000+i}
                 />
-                <Text key={data.id} style={data.isCompleted == 0 ?styles.item:styles.itemCompleted}>{data.text}</Text>
+                <Text key={data.id} numberOfLines={1} style={data.isCompleted == 0 ?styles.item:styles.itemCompleted}>{data.text}</Text>
                 
                 <IconButton
                     icon="delete"
                     color={Colors.red500}
                     size={20}
-                    onPress={() => {removeItemFromList(i);console.log('Pressed');}}
+                    onPress={() => {removeItemFromList(i);}}
                     style={{alignItems:"flex-end"}}
                     key={i+2000}
                 />
@@ -207,6 +262,7 @@ const styles = StyleSheet.create({
     marginBottom:5,
   },
   item: {
+    flex:1,
     color:"white",
     padding:10,
     width:'100%',
@@ -225,6 +281,7 @@ const styles = StyleSheet.create({
     marginBottom:10,
   },
   itemCompleted: {
+    flex:1,
     color:"grey",
     textDecorationLine: 'line-through',
     padding:10,

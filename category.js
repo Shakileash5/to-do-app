@@ -8,7 +8,7 @@ class Category extends Component {
 
     render() 
     { return(
-        <View  >
+        <View  style={{height:"100%",width:"100%",marginLeft:20,borderRadius:20,backgroundColor:"#2E2E2E",padding:10}}>
             <View style={{flex:2}}>
                 <Text style={{flex:1,color:"grey",paddingTop:10,paddingLeft:10}}>{this.props.todosNo} Tasks</Text>
                 <Text style={{flex:1,color:"white",paddingLeft:10,fontWeight:"bold",fontSize:15}}>{this.props.category}</Text>
