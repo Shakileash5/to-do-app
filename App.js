@@ -1,7 +1,7 @@
 import { StatusBar } from 'expo-status-bar';
 import React,{useState,useEffect,useRef} from 'react';
 import { render } from 'react-dom';
-import { StyleSheet, Text, View,TextInput,Dimensions,Button,ScrollView,SafeAreaView } from 'react-native';
+import { StyleSheet, Text, View,TextInput,Dimensions,Button,ScrollView,SafeAreaView,TouchableOpacity } from 'react-native';
 import { DefaultTheme, Provider as PaperProvider ,IconButton, Colors,RadioButton,ProgressBar  } from 'react-native-paper';
 import { AppRegistry } from 'react-native';
 //import Carousel from 'react-native-snap-carousel';
@@ -21,68 +21,47 @@ function App() {
 
   const addItemToList = ()=>{
     //setItems([...items,temp]);
-    let list = items
-    list.unshift({id:list.length,text:inputText,isCompleted:0})
-    
-    setItems(list);
-    setText('');
-    setShow(0);
-
-    let listFull = todos
-
-
+    let listFull = todos;
     for(var key in listFull){
       if(inputCategory.toLowerCase()==key.toLowerCase()){
-        console.log(listFull[key]);
-        listFull[key].unshift({id:list.length,text:inputText,isCompleted:0})
+        listFull[key].unshift({id:listFull.length,text:inputText,isCompleted:0});
+        setItems(listFull[key]);
       }
     }
     setTodos(listFull);  
     setCurrentCategory(inputCategory);
+    setText('');
+    setShow(0);
 
   }
 
   const removeItemFromList = (id)=>{
-    let list = [...items];
-    list.splice(id,1);
-    setItems(list);
-    let listFull = todos
+    let listFull = todos;
     for(var key in listFull){
       if(currentCategory.toLowerCase()==key.toLowerCase()){
-        console.log(listFull[key]);
         let list = [...listFull[key]];
         list.splice(id,1);
-        console.log(list,"list")
-        listFull[key] = [...list]
+        listFull[key] = [...list];
         setTodos(listFull);
-        console.log(listFull)
+        setItems(listFull[key]);
       }
     }
   }
 
   const taskCompleted = (id)=>{
 
-    let list = [...items];
-    let holdElement = {};
-    list[id].isCompleted = 1;
-    holdElement = list[id];
-    list.splice(id,1);
-    list.push(holdElement)
-    setItems(list);
     let listFull = todos
     for(var key in listFull){
       if(currentCategory.toLowerCase()==key.toLowerCase()){
-        console.log(listFull[key]);
         let list = [...listFull[key]];
         let holdElement = {};
         list[id].isCompleted = 1;
         holdElement = list[id];
         list.splice(id,1);
-        list.push(holdElement)
-        console.log(list,"list")
-        listFull[key] = [...list]
+        list.push(holdElement);
+        listFull[key] = [...list];
         setTodos(listFull);
-        console.log(listFull)
+        setItems(listFull[key]);
       }
     }
 
@@ -112,7 +91,10 @@ function App() {
         <SafeAreaView style={styles.container1}>
             <View style={{flex:1,padding:20}}>
               <ScrollView horizontal={true} nestedScrollEnabled={true}  showsHorizontalScrollIndicator={false}>
-                    <Category todosNo="10" category="Business" progress="0.2" />
+                
+                    <TouchableOpacity style={{height:"100%",width:"40%",marginLeft:20,borderRadius:20,backgroundColor:"#2E2E2E",padding:10,}} onPress={()=>console.log("fefiwuehf")}>
+                      <Category todosNo="10" category="Business" progress="0.2" />
+                    </TouchableOpacity> 
                     <Category todosNo="45" category="Personel" progress="0.6" />
                     <Category todosNo="15" category="Others" progress="0.8" />           
               </ScrollView>
@@ -143,9 +125,9 @@ function App() {
             </View>
             
           }
-          {items.map((data,i)=>{
-            //console.log("see",data.id,data.text);
-          
+          {
+      
+          items.map((data,i)=>{
           return( 
           //<Text key={i} style={styles.item}>{data.text}</Text>
             <View style={data.isCompleted == 0 ?styles.itemView:styles.itemViewCompleted}>
