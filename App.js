@@ -10,8 +10,11 @@ import Category from './category';
 function App() {
   const {height,width} = Dimensions.get('window');
   const [focused,setFocused] = useState(0);
+  const [todos,setTodos] = useState({"Personal":[]});
   const [items,setItems] = useState([]);
   const [inputText,setText] = useState("");
+  const [inputCategory,setCategory] = useState("");
+  const [currentCategory,setCurrentCategory] = useState("");
   const [show, setShow] = React.useState(0);
   const createItemNode = useRef();
 
@@ -19,17 +22,42 @@ function App() {
   const addItemToList = ()=>{
     //setItems([...items,temp]);
     let list = items
-    list.push({id:list.length,text:inputText,isCompleted:0})
+    list.unshift({id:list.length,text:inputText,isCompleted:0})
     
     setItems(list);
     setText('');
     setShow(0);
+
+    let listFull = todos
+
+
+    for(var key in listFull){
+      if(inputCategory.toLowerCase()==key.toLowerCase()){
+        console.log(listFull[key]);
+        listFull[key].unshift({id:list.length,text:inputText,isCompleted:0})
+      }
+    }
+    setTodos(listFull);  
+    setCurrentCategory(inputCategory);
+
   }
 
   const removeItemFromList = (id)=>{
     let list = [...items];
     list.splice(id,1);
     setItems(list);
+    let listFull = todos
+    for(var key in listFull){
+      if(currentCategory.toLowerCase()==key.toLowerCase()){
+        console.log(listFull[key]);
+        let list = [...listFull[key]];
+        list.splice(id,1);
+        console.log(list,"list")
+        listFull[key] = [...list]
+        setTodos(listFull);
+        console.log(listFull)
+      }
+    }
   }
 
   const taskCompleted = (id)=>{
@@ -41,6 +69,22 @@ function App() {
     list.splice(id,1);
     list.push(holdElement)
     setItems(list);
+    let listFull = todos
+    for(var key in listFull){
+      if(currentCategory.toLowerCase()==key.toLowerCase()){
+        console.log(listFull[key]);
+        let list = [...listFull[key]];
+        let holdElement = {};
+        list[id].isCompleted = 1;
+        holdElement = list[id];
+        list.splice(id,1);
+        list.push(holdElement)
+        console.log(list,"list")
+        listFull[key] = [...list]
+        setTodos(listFull);
+        console.log(listFull)
+      }
+    }
 
   }
 
@@ -91,6 +135,8 @@ function App() {
             <View style={show==1?styles.getItemsCard:{display:"none"}} ref={createItemNode} >
               <Text style={{color:"white",fontWeight:"bold",padding:5,}}>Add an item</Text>
                 <TextInput style={focused?styles.addTextFocused:styles.addText} onChangeText={(text)=>{setText(text);}} onFocus={()=>setFocused(1)} value={inputText} onBlur={()=>setFocused(0)} placeholder="Enter the item!"></TextInput>
+                <Text style={{color:"white",fontWeight:"bold",padding:5,}}>Add the Category</Text> 
+                <TextInput style={focused?styles.addTextFocused:styles.addText} onChangeText={(text)=>{setCategory(text);}} onFocus={()=>setFocused(1)} value={inputCategory} onBlur={()=>setFocused(0)} placeholder="Personel"></TextInput>
                 <View style={{alignSelf:"flex-end"}}>
                   <Button title="Add" style={{alignSelf:"flex-end"}} onPress={()=>addItemToList()}></Button>
                 </View>
@@ -224,7 +270,9 @@ const styles = StyleSheet.create({
     alignItems:"flex-start",
     alignSelf:"center",
     borderRadius:10,
+    width:"100%",
     padding:20,
+    marginLeft:30,
     marginBottom:10,
   },
 });
