@@ -1,6 +1,6 @@
 import { StatusBar } from 'expo-status-bar';
-import React,{useState,useEffect,useRef} from 'react';
-import { StyleSheet, Text, View,TextInput,Dimensions,Button,ScrollView,SafeAreaView,TouchableOpacity } from 'react-native';
+import React,{useState,useEffect,useRef,ReactDOM,createRef} from 'react';
+import { StyleSheet, Text, View,TextInput,Dimensions,Button,ScrollView,SafeAreaView,TouchableOpacity,Modal } from 'react-native';
 import {Provider as PaperProvider ,IconButton, Colors,RadioButton } from 'react-native-paper';
 import { AppRegistry } from 'react-native';
 import Category from './category';
@@ -13,22 +13,22 @@ function App() {
   const [inputText,setText] = useState("");
   const [inputCategory,setCategory] = useState("");
   const [currentCategory,setCurrentCategory] = useState("");
-  const [show, setShow] = React.useState(0);
-  const createItemNode = useRef();
+  const [show, setShow] = useState(0);
+  const [dummy,setDummy] = useState({modalVisible: false,})
+  const createItemNode = createRef();
 
 
   const set_currentCategory = (Category)=>{
-    for(var key in todos){
-      
+    for(var key in todos){   
       if(Category.toLowerCase()==key.toLowerCase()){
           setItems(todos[key]);
+          setCurrentCategory(key);
           console.log("set")
       }
     }
   } 
 
   const getCompletedPercent = (Category)=>{
-
     var count = 0;
     var len = 0;
     for(var key in todos){
@@ -45,11 +45,9 @@ function App() {
       }
     }
     return count/len;
-
   }
 
-  const addItemToList = ()=>{
-    //setItems([...items,temp]);
+  const addItemToList = ()=>{ 
     let listFull = todos;
     let flag = 0;
     for(var key in listFull){
@@ -82,9 +80,10 @@ function App() {
         if(list.length==0){
           if(key.toLowerCase()!="personal"){
             delete listFull[key];
-            setCurrentCategory("Personal");
-            setItems([])
+           
           }
+          setCurrentCategory("Personal");
+          setItems([]);
         }
         else{
           setItems(listFull[key]);
@@ -99,6 +98,7 @@ function App() {
     let listFull = todos
     for(var key in listFull){
       if(currentCategory.toLowerCase()==key.toLowerCase()){
+        console.log(currentCategory,"category")
         let list = [...listFull[key]];
         let holdElement = {};
         list[id].isCompleted = 1;
@@ -113,49 +113,41 @@ function App() {
 
   }
 
-  const handleClick = (e)=>{
-    if(!createItemNode.current.contains(e.target)){
-      setShow(0);
-      return;
-    }
-
+  const events = (evt)=>{
+    evt.persist();
+    //const domNode = ReactDOM.findDOMNode(createItemNode.current)
+    console.log(createItemNode.current.contains,"\n\nomg")
   }
-
+/*
   useEffect(()=>{
     document.addEventListener("mousedown", handleClick);
     return () => {
       document.removeEventListener("mousedown", handleClick);
     };
   },[show]);
-
+*/
   useEffect(()=>{
     set_currentCategory(currentCategory);
   },[currentCategory])
 
-
-
    return (
      
-    <View style={styles.container}> 
-
-        <Text style={{color:"white",fontWeight:"bold",alignSelf:"flex-start"}}>Todo's Category</Text>
-        <SafeAreaView style={styles.container1}>
-            <View style={{flex:2,padding:20,}}>
-              <ScrollView horizontal={true} nestedScrollEnabled={true}  showsHorizontalScrollIndicator={false}>
-                {
-                  Object.keys(todos).map(function(key,i){      
-                    return(
-                    <TouchableOpacity style={{marginRight:15}} key={i} onPress={()=>set_currentCategory(key)}>
+    <View style={styles.container}  onStartShouldSetResponder={evt=>{events(evt);}}  > 
+        <Text>This is check</Text>
+        <Text style={{color:"white",fontWeight:"bold",alignSelf:"flex-start"}}>Todo's Category </Text>
+            <View style={{padding:5,height:120}}>
+              <ScrollView horizontal={true} contentContainerStyle={{flexGrow:1}} style={{padding:5,}} showsHorizontalScrollIndicator={false}>
+               {
+                  Object.keys(todos).map(function(key,i){
+                  return (
+                    <TouchableOpacity style={{marginRight:0,flexGrow: 1}} key={i} onPress={()=>set_currentCategory(key)}>
                       <Category todosNo={todos[key].length} category={key} progress={getCompletedPercent(key)} />
                     </TouchableOpacity>
-                     )
-                  })  
-                  
-                }        
+                    ); 
+                  })
+                }
               </ScrollView>
-            </View>
-          
-        </SafeAreaView>
+            </View>  
         
         <Text style={{color:"white",fontWeight:"bold",alignSelf:"flex-start"}}>Todo's list</Text>
         
@@ -167,19 +159,23 @@ function App() {
           size={40}>
           
         </IconButton>
-        <ScrollView style={styles.cardView}>
-          {  
-            <View style={show==1?styles.getItemsCard:{display:"none"}} ref={createItemNode} >
-              <Text style={{color:"white",fontWeight:"bold",padding:5,}}>Add an item</Text>
+        <View >
+        </View> 
+        <View style={show==1?styles.getItemsCard:{display:"none"}} ref={createItemNode} >
+                <View style={{alignSelf:"flex-end",margin:-10}}>
+                  <IconButton icon="close" color={Colors.red700} style={{alignSelf:"flex-end",padding:0}} onPress={()=>{setShow(0);}} size={18}></IconButton>
+                </View>
+                <Text style={{color:"white",fontWeight:"bold",padding:5,}}>Add an item</Text>
                 <TextInput style={focused?styles.addTextFocused:styles.addText} onChangeText={(text)=>{setText(text);}} onFocus={()=>setFocused(1)} value={inputText} onBlur={()=>setFocused(0)} placeholder="Enter the item!"></TextInput>
                 <Text style={{color:"white",fontWeight:"bold",padding:5,}}>Add the Category</Text> 
                 <TextInput style={focused?styles.addTextFocused:styles.addText} onChangeText={(text)=>{setCategory(text);}} onFocus={()=>setFocused(1)} value={inputCategory} onBlur={()=>setFocused(0)} placeholder="Personal"></TextInput>
-                <View style={{alignSelf:"flex-end"}}>
-                  <Button title="Add" style={{alignSelf:"flex-end"}} onPress={()=>addItemToList()}></Button>
+                <View style={{alignSelf:"flex-end",padding:10}}>
+                
+                  <Button title="Add" style={{alignSelf:"flex-end",padding:20}} onPress={()=>addItemToList()}></Button>
+                  
                 </View>
-            </View>
-            
-          }
+        </View>
+        <ScrollView style={styles.cardView} > 
           {
       
           items.map((data,i)=>{
@@ -207,10 +203,8 @@ function App() {
                 />
             </View>
           );
-        })}
-        
+        })}    
       </ScrollView>
-      <StatusBar style="auto" />
   </View>
   );
 }
@@ -219,16 +213,12 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding:10,
-    flexDirection:"Column",
+    flexDirection:"column",
     backgroundColor: '#1E1E1E',
     
     zIndex:0,
     //justifyContent: 'center',
     color:'#fff',
-  },
-  container1: {
-    
-    
   },
   addItem: {
     padding:10,
@@ -237,25 +227,27 @@ const styles = StyleSheet.create({
   },
   addText: {
     color: "white",
-    width: "100%",
+    width: "90%",
     borderColor: "#03DAC5",
     borderBottomWidth: 1,
-    padding: 10,
+    padding: 0,
     marginRight:10,
+    marginLeft:5,
     marginBottom:10,
   },
   addTextFocused: {
     color: "white",
-    width: "100%",
+    width: "90%",
     borderColor: "purple",
     borderBottomWidth: 1,
-    padding: 10,
+    padding: 0,
+    marginLeft:5,
     marginBottom:10,
   },
   cardView: {
     padding:20,
     width:'90%',
-    flexDirection:"Column",
+    flexDirection:"column",
     //backgroundColor: '#2E2E2E',
     borderColor:"grey",
     borderRadius:5,
@@ -305,14 +297,16 @@ const styles = StyleSheet.create({
     backgroundColor:"#3F3F3F",
     position:"absolute",
     zIndex:1,
-    flexDirection:"Column",
+    flexDirection:"column",
     alignItems:"flex-start",
     alignSelf:"center",
-    borderRadius:10,
-    width:"100%",
-    padding:20,
-    marginLeft:30,
+    borderRadius:15,
+    width:"90%",
+    padding:10,
+    top:150,
+    marginLeft:0,
     marginBottom:10,
+    justifyContent:"center",
   },
 });
 
