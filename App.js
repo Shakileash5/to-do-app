@@ -3,6 +3,7 @@ import React,{useState,useEffect,useRef,ReactDOM,createRef} from 'react';
 import { StyleSheet, Text, View,TextInput,Dimensions,Button,ScrollView,SafeAreaView,TouchableOpacity,Modal } from 'react-native';
 import {Provider as PaperProvider ,IconButton, Colors,RadioButton } from 'react-native-paper';
 import { AppRegistry } from 'react-native';
+import Constants from "expo-constants";
 import Category from './category';
 
 function App() {
@@ -133,9 +134,9 @@ function App() {
    return (
      
     <View style={styles.container}  onStartShouldSetResponder={evt=>{events(evt);}}  > 
-        <Text>This is check</Text>
+        <Text style={{color:"white",fontWeight:"bold",fontSize:25,paddingBottom:30,paddingTop:30}}>What's up, Shaki</Text>
         <Text style={{color:"white",fontWeight:"bold",alignSelf:"flex-start"}}>Todo's Category </Text>
-            <View style={{padding:5,height:120}}>
+            <View style={{padding:5,height:125}}>
               <ScrollView horizontal={true} contentContainerStyle={{flexGrow:1}} style={{padding:5,}} showsHorizontalScrollIndicator={false}>
                {
                   Object.keys(todos).map(function(key,i){
@@ -205,6 +206,8 @@ function App() {
           );
         })}    
       </ScrollView>
+      <StatusBar style="inverted" hidden={false} />
+      
   </View>
   );
 }
@@ -213,6 +216,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     padding:10,
+    paddingTop: Constants.statusBarHeight,
     flexDirection:"column",
     backgroundColor: '#1E1E1E',
     
