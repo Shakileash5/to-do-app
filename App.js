@@ -3,12 +3,16 @@ import React,{useState,useEffect,useRef,ReactDOM,createRef} from 'react';
 import { StyleSheet, Text, View,TextInput,Dimensions,Button,ScrollView,SafeAreaView,TouchableOpacity,Modal } from 'react-native';
 import {Provider as PaperProvider ,IconButton, Colors,RadioButton } from 'react-native-paper';
 import AsyncStorage from '@react-native-community/async-storage'
-import { AppRegistry } from 'react-native';
+import { AppRegistry,Header } from 'react-native';
 import Constants from "expo-constants";
 import Category from './category';
+import Tasks from "./tasks"
 
 function App() {
   const [constructorHasRun,setConstructorHasRun] = useState(false);
+  const [userName,setUserName] = useState("Pal");
+  const [textUname,setTextUname] = useState("");
+  const [showChangeUName,setShowChangeUName] = useState(0);
   const [focused,setFocused] = useState(0);
   const [todos,setTodos] = useState({"Personal":[]});
   const [items,setItems] = useState([]);
@@ -29,17 +33,32 @@ function App() {
     }
   }
 
+  const storeUserName = async () =>{
+    try{
+      await AsyncStorage.setItem("userName",userName);
+      console.log("set",userName);
+    }
+    catch(error){
+      console.log(error);
+    }
+  }
+
   const retrieveData = async ()=>{
     try{
 
       let obj = await AsyncStorage.getItem("todos");
+      let uname = await AsyncStorage.getItem("userName"); 
       if(obj!=null){
         obj = JSON.parse(obj);
         //console.log("recieved obj",obj);
         setCurrentCategory("Personal");
         setTodos(obj);;
         setItems(obj["Personal"]);
-      }    
+      }  
+      if(uname!=null){
+        setUserName(uname);
+        console.log("get",uname);
+      }  
     }
     catch(error){
       console.log(error);
@@ -154,6 +173,13 @@ function App() {
     };
   },[show]);
 */
+
+  const displayCategory = ()=>{
+    return(
+      <Text>{currentCategory}</Text>
+    )
+  }
+
   useEffect(()=>{
     set_currentCategory(currentCategory);
   },[currentCategory])
@@ -173,7 +199,29 @@ function App() {
    return (
      
     <View style={styles.container} > 
-        <Text style={{color:"white",fontWeight:"bold",fontSize:25,paddingBottom:30,paddingTop:30}}>What's up, Shaki</Text>
+        <View style={{top:0,marginTop:0,margin:-10,backgroundColor:"#161B22",height:45,flexDirection:"row",}}>
+          <Text style={{alignSelf:"flex-start",color:"#6E7681",fontWeight:"bold",fontSize:15,padding:10}}>{currentCategory}</Text>
+          <IconButton
+          icon="account"
+          color={Colors.blue300}
+          style={{alignSelf:"flex-end",right:0,position:"absolute",top:0}}
+          onPress={()=>{setShowChangeUName(1);setShow(0);}}
+          >
+          </IconButton>
+        </View>
+        <View style={showChangeUName==1?styles.getItemsCard:{display:"none"}} ref={createItemNode} >
+                <View style={{alignSelf:"flex-end",margin:-10}}>
+                  <IconButton icon="close" color={Colors.red700} style={{alignSelf:"flex-end",padding:0}} onPress={()=>{setShowChangeUName(0);setText("");}} size={18}></IconButton>
+                </View>
+                <Text style={{color:"white",fontWeight:"bold",padding:5,}}>Change your Username</Text>
+                <TextInput style={focused?styles.addTextFocused:styles.addText}  onChangeText={(text)=>{setText(text);}} onFocus={()=>setFocused(1)} value={inputText}  onBlur={()=>setFocused(0)} placeholder="Enter your username .."></TextInput>
+                <View style={{alignSelf:"flex-end",padding:0}}>
+                  <TouchableOpacity style={{alignSelf:"flex-end",padding:20}} onPress={()=>{setUserName(inputText);storeUserName();setText("");setShowChangeUName(0)}} >
+                    <Text style={(inputText!="")?{color:"#2196F3",fontWeight:"bold",fontSize:18}:{color:"#2F525F",fontWeight:"bold",fontSize:18}}>Change</Text>
+                  </TouchableOpacity>
+                </View>
+        </View>
+        <Text style={{color:"white",fontWeight:"bold",fontSize:25,paddingBottom:30,paddingTop:30}}>What's up,{userName}</Text>
         <Text style={{color:"white",fontWeight:"bold",alignSelf:"flex-start"}}>Todo's Category </Text>
             <View style={{padding:5,height:125}}>
               <ScrollView horizontal={true} contentContainerStyle={{flexGrow:1}} style={{padding:5,}} showsHorizontalScrollIndicator={false}>
@@ -195,24 +243,21 @@ function App() {
           icon="pencil" 
           color={Colors.green500} 
           style={{alignSelf:"flex-end",position:'absolute',zIndex:1,bottom:10,}}  
-          onPress={()=>{setShow(1);}}
+          onPress={()=>{setShow(1);setShowChangeUName(0);}}
           size={40}>
           
         </IconButton>
-        <View >
-        </View> 
         <View style={show==1?styles.getItemsCard:{display:"none"}} ref={createItemNode} >
                 <View style={{alignSelf:"flex-end",margin:-10}}>
-                  <IconButton icon="close" color={Colors.red700} style={{alignSelf:"flex-end",padding:0}} onPress={()=>{setShow(0);}} size={18}></IconButton>
+                  <IconButton icon="close" color={Colors.red700} style={{alignSelf:"flex-end",padding:0}} onPress={()=>{setShow(0);setText("");}} size={18}></IconButton>
                 </View>
                 <Text style={{color:"white",fontWeight:"bold",padding:5,}}>Add an item</Text>
                 <TextInput style={focused?styles.addTextFocused:styles.addText} onChangeText={(text)=>{setText(text);}} onFocus={()=>setFocused(1)} value={inputText} onBlur={()=>setFocused(0)} placeholder="Enter the item!"></TextInput>
                 <TextInput style={focused?styles.addTextFocused:styles.addText} onChangeText={(text)=>{setCategory(text);}} onFocus={()=>setFocused(1)} value={inputCategory} onBlur={()=>setFocused(0)} placeholder="Enter the category"></TextInput>
                 <View style={{alignSelf:"flex-end",padding:0}}>
-                <TouchableOpacity style={{alignSelf:"flex-end",padding:20}} onPress={()=>addItemToList()} >
-                  <Text style={(inputText&&inputCategory)?{color:"#2196F3",fontWeight:"bold",fontSize:18}:{color:"#2F525F",fontWeight:"bold",fontSize:18}}>Add</Text>
-                </TouchableOpacity>
-                  
+                  <TouchableOpacity style={{alignSelf:"flex-end",padding:20}} onPress={()=>{(inputText&&inputCategory)?addItemToList():null;}} >
+                    <Text style={(inputText&&inputCategory)?{color:"#2196F3",fontWeight:"bold",fontSize:18}:{color:"#2F525F",fontWeight:"bold",fontSize:18}}>Add</Text>
+                  </TouchableOpacity>
                 </View>
         </View>
         <ScrollView style={styles.cardView} > 
@@ -257,7 +302,7 @@ const styles = StyleSheet.create({
     padding:10,
     paddingTop: Constants.statusBarHeight,
     flexDirection:"column",
-    backgroundColor: '#1E1E1E',
+    backgroundColor: '#0D1117',
     
     zIndex:0,
     //justifyContent: 'center',
@@ -289,7 +334,7 @@ const styles = StyleSheet.create({
   },
   cardView: {
     padding:20,
-    width:'90%',
+    width:'100%',
     flexDirection:"column",
     //backgroundColor: '#2E2E2E',
     borderColor:"grey",
@@ -298,7 +343,8 @@ const styles = StyleSheet.create({
   },
   item: {
     flex:1,
-    color:"white",
+    color:"#1F6FEB",
+    fontWeight:"bold",
     padding:10,
     width:'100%',
     borderRadius:10,
@@ -308,7 +354,7 @@ const styles = StyleSheet.create({
     padding:10,
     width:'100%',
     flexDirection:"row",
-    backgroundColor: '#2E2E2E',
+    backgroundColor: '#161B22',
     borderBottomWidth:0,
     borderBottomColor:"purple",
     borderColor:"grey",
@@ -328,7 +374,7 @@ const styles = StyleSheet.create({
     padding:10,
     width:'100%',
     flexDirection:"row",
-    backgroundColor: '#2E2E2E',
+    backgroundColor: '#161B22',
     borderBottomWidth:2,
     borderBottomColor:"green",
     borderColor:"grey",
@@ -337,7 +383,7 @@ const styles = StyleSheet.create({
   },
   getItemsCard: {
 
-    backgroundColor:"#3F3F3F",
+    backgroundColor:"#21262D",
     position:"absolute",
     zIndex:1,
     flexDirection:"column",

@@ -2,7 +2,6 @@ import { StatusBar } from 'expo-status-bar';
 import React,{useState,Component} from 'react';
 import { StyleSheet, Text, View,TextInput,Dimensions,Button,TouchableOpacity } from 'react-native';
 import { DefaultTheme,IconButton, Colors,RadioButton  } from 'react-native-paper';
-import Overlay from 'react-native-modal-overlay';
 
 class Tasks extends Component{
     constructor(props){
@@ -22,11 +21,9 @@ class Tasks extends Component{
             
             
             
-        <Overlay visible={this.state.modalVisible} onClose={this.onClose1()}  closeOnTouchOutside>
-         <TouchableOpacity onPress={console.log("oi")}>
+        
           <Text>Some Modal Content</Text>
-          </TouchableOpacity> 
-        </Overlay>
+       
         <Button title="th" onPress={()=>{this.setDummy(true)}}>ok</Button>
         </View>
   );}
