@@ -1,17 +1,59 @@
 import React,{Component,useState,useEffect,useRef} from 'react';
-import { StyleSheet, Text, View,TextInput,TouchableOpacity,Button,ScrollView,SafeAreaView } from 'react-native';
+import { StyleSheet, Text, View,TextInput,TouchableOpacity} from 'react-native';
+import AsyncStorage from '@react-native-community/async-storage'
 
 function SignUp(){
+
+    const [username,setUserName] = useState('');
+    const [email,setEmail] = useState('');
+    const [password,setPassword] = useState('');
+
+    const [constructorHasRun,setConstructorHasRun] = useState(false);
+    
+    const storeData = async ()=>{
+        try{
+            console.log("its now pressed",username,email,password);
+            await AsyncStorage.setItem("userName",username  );
+        }
+        catch(error){
+            console.log(error);
+        }
+    }
+
+    const retrieveData = async ()=>{
+        try{
+
+            let userName_  = await AsyncStorage.getItem("userName");
+            console.log(userName_," name")
+
+        }
+        catch(error){
+            console.log(error)
+        }
+    }
+
+    const constructor = ()=>{
+        if(constructorHasRun){
+            return;
+        }
+        console.log("act like constructor");
+        retrieveData();
+        setConstructorHasRun(true);
+    }
+    constructor();
+
+    
+
 
     return(
 
         <View style={Styles.container}>
             <View style={{alignItems:'center',padding:0,width:"85%"}}>
                 <Text style={Styles.logo}>ToDO App</Text>    
-                <TextInput style={Styles.inputView} placeholder="Username"></TextInput>
-                <TextInput style={Styles.inputView} placeholder="Email Id"></TextInput>
-                <TextInput style={Styles.inputView} placeholder="Password"></TextInput>
-                <TouchableOpacity style={Styles.signupBtn}>
+                <TextInput style={Styles.inputView} placeholder="Username" onChangeText={(text)=>{setUserName(text)}}></TextInput>
+                <TextInput style={Styles.inputView} placeholder="Email Id" onChangeText={(text)=>{setEmail(text)}}></TextInput>
+                <TextInput style={Styles.inputView} placeholder="Password" onChangeText={(text)=>{setPassword(text)}}></TextInput>
+                <TouchableOpacity style={Styles.signupBtn} onPress={()=>storeData()}>
                     <Text style={{color:"white",fontWeight:"bold"}}>SIGNUP</Text>
                 </TouchableOpacity>
             </View>

@@ -1,34 +1,40 @@
 import { StatusBar } from 'expo-status-bar';
-import React,{useState} from 'react';
-import { StyleSheet, Text, View,TextInput,Dimensions,Button } from 'react-native';
+import React,{useState,Component} from 'react';
+import { StyleSheet, Text, View,TextInput,Dimensions,Button,TouchableOpacity } from 'react-native';
 import { DefaultTheme,IconButton, Colors,RadioButton  } from 'react-native-paper';
+import Overlay from 'react-native-modal-overlay';
 
-function Tasks(){
-    const [checked, setChecked] = React.useState('second');
-    return (
+class Tasks extends Component{
+    constructor(props){
+        super(props)
+        this.state = {
+            modalVisible: false,
+        }
+    }
+    
+    setDummy = (val)=>{
+        this.setState( { modalVisible:val})
+    }
+
+    onClose1 = () => {this.setDummy(false);}
+    render(){return (
         <View style={styles.itemView}>
-            <RadioButton
-                value="first"
-                color={Colors.cyan500}
-                status={ checked === 'first' ? 'checked' : 'unchecked' }
-                onPress={() => setChecked('first')}
-                style={{alignItems:"flex-start",color:"red"}}
-            />
-            <Text key={0} style={styles.item}>thrdvcehjuc</Text>
             
-            <IconButton
-                icon="delete"
-                color={Colors.red500}
-                size={20}
-                onPress={() => console.log('Pressed')}
-                style={{alignItems:"flex-end"}}
-            />
+            
+            
+        <Overlay visible={this.state.modalVisible} onClose={this.onClose1()}  closeOnTouchOutside>
+         <TouchableOpacity onPress={console.log("oi")}>
+          <Text>Some Modal Content</Text>
+          </TouchableOpacity> 
+        </Overlay>
+        <Button title="th" onPress={()=>{this.setDummy(true)}}>ok</Button>
         </View>
-  );
+  );}
 }
 
 const styles = StyleSheet.create({
     item: {
+        
         color:"white",
         padding:10,
         width:'100%',
@@ -36,6 +42,7 @@ const styles = StyleSheet.create({
         
       },
       itemView: {
+        flex:1,
         padding:0,
         width:'100%',
         flexDirection:"row",

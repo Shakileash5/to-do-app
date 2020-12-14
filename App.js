@@ -2,12 +2,13 @@ import { StatusBar } from 'expo-status-bar';
 import React,{useState,useEffect,useRef,ReactDOM,createRef} from 'react';
 import { StyleSheet, Text, View,TextInput,Dimensions,Button,ScrollView,SafeAreaView,TouchableOpacity,Modal } from 'react-native';
 import {Provider as PaperProvider ,IconButton, Colors,RadioButton } from 'react-native-paper';
+import AsyncStorage from '@react-native-community/async-storage'
 import { AppRegistry } from 'react-native';
 import Constants from "expo-constants";
 import Category from './category';
 
 function App() {
-  const {height,width} = Dimensions.get('window');
+  const [constructorHasRun,setConstructorHasRun] = useState(false);
   const [focused,setFocused] = useState(0);
   const [todos,setTodos] = useState({"Personal":[]});
   const [items,setItems] = useState([]);
@@ -15,9 +16,35 @@ function App() {
   const [inputCategory,setCategory] = useState("");
   const [currentCategory,setCurrentCategory] = useState("");
   const [show, setShow] = useState(0);
-  const [dummy,setDummy] = useState({modalVisible: false,})
   const createItemNode = createRef();
 
+  const storeData = async ()=>{
+    try{
+      let JsonObj = JSON.stringify(todos);
+      //console.log("obj",JsonObj);
+      await AsyncStorage.setItem("todos",JsonObj);
+    }
+    catch(error){
+      console.log(error);
+    }
+  }
+
+  const retrieveData = async ()=>{
+    try{
+
+      let obj = await AsyncStorage.getItem("todos");
+      if(obj!=null){
+        obj = JSON.parse(obj);
+        //console.log("recieved obj",obj);
+        setCurrentCategory("Personal");
+        setTodos(obj);;
+        setItems(obj["Personal"]);
+      }    
+    }
+    catch(error){
+      console.log(error);
+    }
+  }
 
   const set_currentCategory = (Category)=>{
     for(var key in todos){   
@@ -62,6 +89,7 @@ function App() {
       let text = inputCategory[0].toUpperCase()  + inputCategory.slice(1).toLowerCase();
       listFull[text] = [{id:0,text:inputText,isCompleted:0}]
     }
+    storeData();
     setTodos(listFull);  
     setCurrentCategory(inputCategory);
     setText('');
@@ -88,6 +116,7 @@ function App() {
           setItems(listFull[key]);
         }
         setTodos(listFull);
+        storeData();
       }
     }
   }
@@ -106,6 +135,7 @@ function App() {
         listFull[key] = [...list];
         setTodos(listFull);
         setItems(listFull[key]);
+        storeData();
       }
     }
 
@@ -128,9 +158,21 @@ function App() {
     set_currentCategory(currentCategory);
   },[currentCategory])
 
+
+  const constructor = ()=>{
+    if(constructorHasRun){
+        return;
+    }
+    console.log("act like constructor");
+    retrieveData();
+    setConstructorHasRun(true);
+  }
+  constructor();
+
+
    return (
      
-    <View style={styles.container}  onStartShouldSetResponder={evt=>{events(evt);}}  > 
+    <View style={styles.container} > 
         <Text style={{color:"white",fontWeight:"bold",fontSize:25,paddingBottom:30,paddingTop:30}}>What's up, Shaki</Text>
         <Text style={{color:"white",fontWeight:"bold",alignSelf:"flex-start"}}>Todo's Category </Text>
             <View style={{padding:5,height:125}}>
