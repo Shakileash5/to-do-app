@@ -24,7 +24,6 @@ function App() {
       if(Category.toLowerCase()==key.toLowerCase()){
           setItems(todos[key]);
           setCurrentCategory(key);
-          console.log("set")
       }
     }
   } 
@@ -61,7 +60,6 @@ function App() {
 
     if(flag==0){
       let text = inputCategory[0].toUpperCase()  + inputCategory.slice(1).toLowerCase();
-      console.log(text,"dd")
       listFull[text] = [{id:0,text:inputText,isCompleted:0}]
     }
     setTodos(listFull);  
@@ -99,7 +97,6 @@ function App() {
     let listFull = todos
     for(var key in listFull){
       if(currentCategory.toLowerCase()==key.toLowerCase()){
-        console.log(currentCategory,"category")
         let list = [...listFull[key]];
         let holdElement = {};
         list[id].isCompleted = 1;
@@ -168,11 +165,11 @@ function App() {
                 </View>
                 <Text style={{color:"white",fontWeight:"bold",padding:5,}}>Add an item</Text>
                 <TextInput style={focused?styles.addTextFocused:styles.addText} onChangeText={(text)=>{setText(text);}} onFocus={()=>setFocused(1)} value={inputText} onBlur={()=>setFocused(0)} placeholder="Enter the item!"></TextInput>
-                <Text style={{color:"white",fontWeight:"bold",padding:5,}}>Add the Category</Text> 
-                <TextInput style={focused?styles.addTextFocused:styles.addText} onChangeText={(text)=>{setCategory(text);}} onFocus={()=>setFocused(1)} value={inputCategory} onBlur={()=>setFocused(0)} placeholder="Personal"></TextInput>
-                <View style={{alignSelf:"flex-end",padding:10}}>
-                
-                  <Button title="Add" style={{alignSelf:"flex-end",padding:20}} onPress={()=>addItemToList()}></Button>
+                <TextInput style={focused?styles.addTextFocused:styles.addText} onChangeText={(text)=>{setCategory(text);}} onFocus={()=>setFocused(1)} value={inputCategory} onBlur={()=>setFocused(0)} placeholder="Enter the category"></TextInput>
+                <View style={{alignSelf:"flex-end",padding:0}}>
+                <TouchableOpacity style={{alignSelf:"flex-end",padding:20}} onPress={()=>addItemToList()} >
+                  <Text style={(inputText&&inputCategory)?{color:"#2196F3",fontWeight:"bold",fontSize:18}:{color:"#2F525F",fontWeight:"bold",fontSize:18}}>Add</Text>
+                </TouchableOpacity>
                   
                 </View>
         </View>
@@ -232,9 +229,9 @@ const styles = StyleSheet.create({
   addText: {
     color: "white",
     width: "90%",
-    borderColor: "#03DAC5",
-    borderBottomWidth: 1,
-    padding: 0,
+    borderColor: "#fb5b5a",
+    borderBottomWidth: 3,
+    padding:10,
     marginRight:10,
     marginLeft:5,
     marginBottom:10,
@@ -242,9 +239,9 @@ const styles = StyleSheet.create({
   addTextFocused: {
     color: "white",
     width: "90%",
-    borderColor: "purple",
-    borderBottomWidth: 1,
-    padding: 0,
+    borderColor: "#2196F3",
+    borderBottomWidth: 3,
+    padding: 10,
     marginLeft:5,
     marginBottom:10,
   },
