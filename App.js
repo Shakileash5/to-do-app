@@ -35,8 +35,10 @@ function App() {
 
   const storeUserName = async () =>{
     try{
-      await AsyncStorage.setItem("userName",userName);
-      console.log("set",userName);
+      setUserName(inputText);
+      await AsyncStorage.setItem("userName",inputText);
+      setText("");
+      //console.log("set",userName);
     }
     catch(error){
       console.log(error);
@@ -57,7 +59,7 @@ function App() {
       }  
       if(uname!=null){
         setUserName(uname);
-        console.log("get",uname);
+        //console.log("get",uname);
       }  
     }
     catch(error){
@@ -216,7 +218,7 @@ function App() {
                 <Text style={{color:"white",fontWeight:"bold",padding:5,}}>Change your Username</Text>
                 <TextInput style={focused?styles.addTextFocused:styles.addText}  onChangeText={(text)=>{setText(text);}} onFocus={()=>setFocused(1)} value={inputText}  onBlur={()=>setFocused(0)} placeholder="Enter your username .."></TextInput>
                 <View style={{alignSelf:"flex-end",padding:0}}>
-                  <TouchableOpacity style={{alignSelf:"flex-end",padding:20}} onPress={()=>{setUserName(inputText);storeUserName();setText("");setShowChangeUName(0)}} >
+                  <TouchableOpacity style={{alignSelf:"flex-end",padding:20}} onPress={()=>{setUserName(inputText);storeUserName();setShowChangeUName(0)}} >
                     <Text style={(inputText!="")?{color:"#2196F3",fontWeight:"bold",fontSize:18}:{color:"#2F525F",fontWeight:"bold",fontSize:18}}>Change</Text>
                   </TouchableOpacity>
                 </View>
