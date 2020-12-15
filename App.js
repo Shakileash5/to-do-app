@@ -175,13 +175,6 @@ function App() {
     };
   },[show]);
 */
-
-  const displayCategory = ()=>{
-    return(
-      <Text>{currentCategory}</Text>
-    )
-  }
-
   useEffect(()=>{
     set_currentCategory(currentCategory);
   },[currentCategory])
@@ -211,17 +204,16 @@ function App() {
           >
           </IconButton>
         </View>
-        <View style={showChangeUName==1?styles.getItemsCard:{display:"none"}} ref={createItemNode} >
-                <View style={{alignSelf:"flex-end",margin:-10}}>
-                  <IconButton icon="close" color={Colors.red700} style={{alignSelf:"flex-end",padding:0}} onPress={()=>{setShowChangeUName(0);setText("");}} size={18}></IconButton>
-                </View>
-                <Text style={{color:"white",fontWeight:"bold",padding:5,}}>Change your Username</Text>
-                <TextInput style={focused?styles.addTextFocused:styles.addText}  onChangeText={(text)=>{setText(text);}} onFocus={()=>setFocused(1)} value={inputText}  onBlur={()=>setFocused(0)} placeholder="Enter your username .."></TextInput>
-                <View style={{alignSelf:"flex-end",padding:0}}>
-                  <TouchableOpacity style={{alignSelf:"flex-end",padding:20}} onPress={()=>{setUserName(inputText);storeUserName();setShowChangeUName(0)}} >
-                    <Text style={(inputText!="")?{color:"#2196F3",fontWeight:"bold",fontSize:18}:{color:"#2F525F",fontWeight:"bold",fontSize:18}}>Change</Text>
-                  </TouchableOpacity>
-                </View>
+        <View style={showChangeUName==1?styles.getItemsCardView:{display:"none"}} onStartShouldSetResponder={() =>{setShowChangeUName(0);}}>
+          <View style={showChangeUName==1?styles.getItemsCard:{display:"none"}} ref={createItemNode} >
+                  <Text style={{color:"white",fontWeight:"bold",padding:10,}}>Change your Username</Text>
+                  <TextInput style={focused?styles.addTextFocused:styles.addText}  onChangeText={(text)=>{setText(text);}} onFocus={()=>setFocused(1)} value={inputText}  onBlur={()=>setFocused(0)} placeholder="Enter your username .."></TextInput>
+                  <View style={{alignSelf:"flex-end",padding:0}}>
+                    <TouchableOpacity style={{alignSelf:"flex-end",padding:20}} onPress={()=>{setUserName(inputText);storeUserName();setShowChangeUName(0)}} >
+                      <Text style={(inputText!="")?{color:"#2196F3",fontWeight:"bold",fontSize:18}:{color:"#2F525F",fontWeight:"bold",fontSize:18}}>Change</Text>
+                    </TouchableOpacity>
+                  </View>
+          </View>
         </View>
         <Text style={{color:"white",fontWeight:"bold",fontSize:25,paddingBottom:30,paddingTop:30}}>What's up,{userName}</Text>
         <Text style={{color:"white",fontWeight:"bold",alignSelf:"flex-start"}}>Todo's Category </Text>
@@ -249,18 +241,18 @@ function App() {
           size={40}>
           
         </IconButton>
-        <View style={show==1?styles.getItemsCard:{display:"none"}} ref={createItemNode} >
-                <View style={{alignSelf:"flex-end",margin:-10}}>
-                  <IconButton icon="close" color={Colors.red700} style={{alignSelf:"flex-end",padding:0}} onPress={()=>{setShow(0);setText("");}} size={18}></IconButton>
-                </View>
-                <Text style={{color:"white",fontWeight:"bold",padding:5,}}>Add an item</Text>
-                <TextInput style={focused?styles.addTextFocused:styles.addText} onChangeText={(text)=>{setText(text);}} onFocus={()=>setFocused(1)} value={inputText} onBlur={()=>setFocused(0)} placeholder="Enter the item!"></TextInput>
-                <TextInput style={focused?styles.addTextFocused:styles.addText} onChangeText={(text)=>{setCategory(text);}} onFocus={()=>setFocused(1)} value={inputCategory} onBlur={()=>setFocused(0)} placeholder="Enter the category"></TextInput>
-                <View style={{alignSelf:"flex-end",padding:0}}>
-                  <TouchableOpacity style={{alignSelf:"flex-end",padding:20}} onPress={()=>{(inputText&&inputCategory)?addItemToList():null;}} >
-                    <Text style={(inputText&&inputCategory)?{color:"#2196F3",fontWeight:"bold",fontSize:18}:{color:"#2F525F",fontWeight:"bold",fontSize:18}}>Add</Text>
-                  </TouchableOpacity>
-                </View>
+        <View style={show==1?styles.getItemsCardView:{display:"none"}} onStartShouldSetResponder={() =>{setShow(0);}}>
+          <View style={show==1?styles.getItemsCard:{display:"none"}} ref={createItemNode} >
+                  
+                  <Text style={{color:"white",fontWeight:"bold",padding:10,}}>Add an item</Text>
+                  <TextInput style={focused?styles.addTextFocused:styles.addText} onChangeText={(text)=>{setText(text);}} onFocus={()=>setFocused(1)} value={inputText} onBlur={()=>setFocused(0)} placeholder="Enter the item!"></TextInput>
+                  <TextInput style={focused?styles.addTextFocused:styles.addText} onChangeText={(text)=>{setCategory(text);}} onFocus={()=>setFocused(1)} value={inputCategory} onBlur={()=>setFocused(0)} placeholder="Enter the category"></TextInput>
+                  <View style={{alignSelf:"flex-end",padding:0}}>
+                    <TouchableOpacity style={{alignSelf:"flex-end",padding:20}} onPress={()=>{(inputText&&inputCategory)?addItemToList():null;}} >
+                      <Text style={(inputText&&inputCategory)?{color:"#2196F3",fontWeight:"bold",fontSize:18}:{color:"#2F525F",fontWeight:"bold",fontSize:18}}>Add</Text>
+                    </TouchableOpacity>
+                  </View>
+          </View>
         </View>
         <ScrollView style={styles.cardView} > 
           {
@@ -399,6 +391,15 @@ const styles = StyleSheet.create({
     marginBottom:10,
     justifyContent:"center",
   },
+  getItemsCardView:{
+    flex:1,
+    height:"100%",
+    backgroundColor:"rgba(52, 52, 52, 0)",
+    position:"absolute",
+    zIndex:1,
+    alignSelf:"center",
+    width:"100%",
+  }
 });
 
 AppRegistry.registerComponent('Todo-list-app', () => 'App');
