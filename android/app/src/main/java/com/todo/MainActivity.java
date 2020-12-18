@@ -1,4 +1,4 @@
-package com.todolistapp;
+package com.todo;
 
 import android.os.Bundle;
 

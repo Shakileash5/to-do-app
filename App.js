@@ -1,31 +1,31 @@
 import { StatusBar } from 'expo-status-bar';
-import React,{useState,useEffect,useRef,ReactDOM,createRef} from 'react';
-import { StyleSheet, Text, View,TextInput,Dimensions,Button,ScrollView,SafeAreaView,TouchableOpacity,Modal } from 'react-native';
+import React,{useState,useEffect} from 'react';
+import { StyleSheet, Text, View,TextInput,ScrollView,TouchableOpacity} from 'react-native';
 import {Provider as PaperProvider ,IconButton, Colors,RadioButton } from 'react-native-paper';
-import AsyncStorage from '@react-native-community/async-storage'
-import { AppRegistry,Header } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import Constants from "expo-constants";
 import Category from './category';
-import Tasks from "./tasks"
 
-function App() {
+export default function App() {
   const [constructorHasRun,setConstructorHasRun] = useState(false);
   const [userName,setUserName] = useState("Pal");
-  const [textUname,setTextUname] = useState("");
   const [showChangeUName,setShowChangeUName] = useState(0);
   const [focused,setFocused] = useState(0);
   const [todos,setTodos] = useState({"Personal":[]});
   const [items,setItems] = useState([]);
   const [inputText,setText] = useState("");
   const [inputCategory,setCategory] = useState("");
-  const [currentCategory,setCurrentCategory] = useState("");
+  const [currentCategory,setCurrentCategory] = useState("Personal");
   const [show, setShow] = useState(0);
-  const createItemNode = createRef();
+
+  var got = false;
+  const setGot = (bool)=>{
+    got = bool;
+  }
 
   const storeData = async ()=>{
     try{
       let JsonObj = JSON.stringify(todos);
-      //console.log("obj",JsonObj);
       await AsyncStorage.setItem("todos",JsonObj);
     }
     catch(error){
@@ -38,7 +38,6 @@ function App() {
       setUserName(inputText);
       await AsyncStorage.setItem("userName",inputText);
       setText("");
-      //console.log("set",userName);
     }
     catch(error){
       console.log(error);
@@ -50,17 +49,24 @@ function App() {
 
       let obj = await AsyncStorage.getItem("todos");
       let uname = await AsyncStorage.getItem("userName"); 
+
       if(obj!=null){
         obj = JSON.parse(obj);
-        //console.log("recieved obj",obj);
         setCurrentCategory("Personal");
         setTodos(obj);;
         setItems(obj["Personal"]);
-      }  
+      }
+      else{
+        console.log("No data");
+      } 
+
       if(uname!=null){
         setUserName(uname);
-        //console.log("get",uname);
       }  
+      else{
+        setShowChangeUName(1);
+      }
+
     }
     catch(error){
       console.log(error);
@@ -95,7 +101,7 @@ function App() {
     return count/len;
   }
 
-  const addItemToList = ()=>{ 
+  const addItemToList = (state)=>{ 
     let listFull = todos;
     let flag = 0;
     for(var key in listFull){
@@ -114,7 +120,9 @@ function App() {
     setTodos(listFull);  
     setCurrentCategory(inputCategory);
     setText('');
-    setShow(0);
+    if(state==0){
+      setShow(0);
+    }
 
   }
 
@@ -162,29 +170,35 @@ function App() {
 
   }
 
-  const events = (evt)=>{
-    evt.persist();
-    //const domNode = ReactDOM.findDOMNode(createItemNode.current)
-    console.log(createItemNode.current.contains,"\n\nomg")
-  }
-/*
-  useEffect(()=>{
-    document.addEventListener("mousedown", handleClick);
-    return () => {
-      document.removeEventListener("mousedown", handleClick);
-    };
-  },[show]);
-*/
   useEffect(()=>{
     set_currentCategory(currentCategory);
   },[currentCategory])
 
+  const checkIsInside = (state)=>{
+    if(got==true){
+      setGot(false);
+    }
+    else{
+      setGot(false);
+      if(state==0){
+      setShowChangeUName(0)
+      }
+      else{
+        setShow(0);
+      }
+    }
+  }
+
+  const setUname = ()=>{
+    setUserName(inputText);
+    storeUserName();
+    setShowChangeUName(0);
+  }
 
   const constructor = ()=>{
     if(constructorHasRun){
         return;
     }
-    console.log("act like constructor");
     retrieveData();
     setConstructorHasRun(true);
   }
@@ -204,12 +218,12 @@ function App() {
           >
           </IconButton>
         </View>
-        <View style={showChangeUName==1?styles.getItemsCardView:{display:"none"}} onStartShouldSetResponder={() =>{setShowChangeUName(0);}}>
-          <View style={showChangeUName==1?styles.getItemsCard:{display:"none"}} ref={createItemNode} >
+        <View style={showChangeUName==1?styles.getItemsCardView:{display:"none"}} onStartShouldSetResponder={() =>{checkIsInside(0)}}>
+          <View style={showChangeUName==1?styles.getItemsCard:{display:"none"}} onStartShouldSetResponder={() =>{setGot(true);}} >
                   <Text style={{color:"white",fontWeight:"bold",padding:10,}}>Change your Username</Text>
-                  <TextInput style={focused?styles.addTextFocused:styles.addText}  onChangeText={(text)=>{setText(text);}} onFocus={()=>setFocused(1)} value={inputText}  onBlur={()=>setFocused(0)} placeholder="Enter your username .."></TextInput>
-                  <View style={{alignSelf:"flex-end",padding:0}}>
-                    <TouchableOpacity style={{alignSelf:"flex-end",padding:20}} onPress={()=>{setUserName(inputText);storeUserName();setShowChangeUName(0)}} >
+                  <TextInput style={focused?styles.addTextFocused:styles.addText}  onChangeText={(text)=>{setText(text);}} onFocus={()=>setFocused(1)} value={inputText}  onBlur={()=>setFocused(0)} placeholder="Enter your username .." placeholderTextColor="grey"></TextInput>
+                  <View style={{alignSelf:"flex-end",padding:0}} >
+                    <TouchableOpacity style={{alignSelf:"flex-end",padding:20}} onPress={()=>{(inputText=="")?null:setUname()}} >
                       <Text style={(inputText!="")?{color:"#2196F3",fontWeight:"bold",fontSize:18}:{color:"#2F525F",fontWeight:"bold",fontSize:18}}>Change</Text>
                     </TouchableOpacity>
                   </View>
@@ -217,7 +231,7 @@ function App() {
         </View>
         <Text style={{color:"white",fontWeight:"bold",fontSize:25,paddingBottom:30,paddingTop:30}}>What's up,{userName}</Text>
         <Text style={{color:"white",fontWeight:"bold",alignSelf:"flex-start"}}>Todo's Category </Text>
-            <View style={{padding:5,height:125}}>
+        <View style={{padding:5,height:125}}>
               <ScrollView horizontal={true} contentContainerStyle={{flexGrow:1}} style={{padding:5,}} showsHorizontalScrollIndicator={false}>
                {
                   Object.keys(todos).map(function(key,i){
@@ -229,7 +243,7 @@ function App() {
                   })
                 }
               </ScrollView>
-            </View>  
+        </View>  
         
         <Text style={{color:"white",fontWeight:"bold",alignSelf:"flex-start"}}>Todo's list</Text>
         
@@ -241,14 +255,24 @@ function App() {
           size={40}>
           
         </IconButton>
-        <View style={show==1?styles.getItemsCardView:{display:"none"}} onStartShouldSetResponder={() =>{setShow(0);}}>
-          <View style={show==1?styles.getItemsCard:{display:"none"}} ref={createItemNode} >
-                  
+        <View style={show==1?styles.getItemsCardView:{display:"none"}} onStartShouldSetResponder={() =>{checkIsInside(1);}}>
+          <View style={show==1?styles.getItemsCard:{display:"none"}} onStartShouldSetResponder={()=>{setGot(true);}} >    
                   <Text style={{color:"white",fontWeight:"bold",padding:10,}}>Add an item</Text>
-                  <TextInput style={focused?styles.addTextFocused:styles.addText} onChangeText={(text)=>{setText(text);}} onFocus={()=>setFocused(1)} value={inputText} onBlur={()=>setFocused(0)} placeholder="Enter the item!"></TextInput>
-                  <TextInput style={focused?styles.addTextFocused:styles.addText} onChangeText={(text)=>{setCategory(text);}} onFocus={()=>setFocused(1)} value={inputCategory} onBlur={()=>setFocused(0)} placeholder="Enter the category"></TextInput>
+                  <TextInput style={focused?styles.addTextFocused:styles.addText} onChangeText={(text)=>{setCategory(text);}} onFocus={()=>setFocused(1)} value={inputCategory} onBlur={()=>setFocused(0)} placeholder="Enter the category" placeholderTextColor="grey"></TextInput>
+                  <View style={{flexDirection:"row",width:"100%"}}>
+                    <TextInput style={focused?styles.addTextFocused:styles.addText} onChangeText={(text)=>{setText(text);}} width="90%" onFocus={()=>setFocused(1)} value={inputText} onBlur={()=>setFocused(0)} placeholder="Enter the item!" placeholderTextColor="grey" ></TextInput>
+                    <IconButton
+                      icon="plus"
+                      color={Colors.blue300}
+                      style={{alignSelf:"flex-end",right:"5%",bottom:"5%",position:"absolute"}}
+                      onPress={()=>{(inputText&&inputCategory)?addItemToList(1):null;}}
+                    >
+                    </IconButton>
+                  </View>
                   <View style={{alignSelf:"flex-end",padding:0}}>
-                    <TouchableOpacity style={{alignSelf:"flex-end",padding:20}} onPress={()=>{(inputText&&inputCategory)?addItemToList():null;}} >
+                    
+                    <TouchableOpacity style={{alignSelf:"flex-end",padding:20}} onPress={()=>{(inputText&&inputCategory)?addItemToList(0):null;}} >
+                    
                       <Text style={(inputText&&inputCategory)?{color:"#2196F3",fontWeight:"bold",fontSize:18}:{color:"#2F525F",fontWeight:"bold",fontSize:18}}>Add</Text>
                     </TouchableOpacity>
                   </View>
@@ -256,32 +280,29 @@ function App() {
         </View>
         <ScrollView style={styles.cardView} > 
           {
-      
-          items.map((data,i)=>{
-          return( 
-          //<Text key={i} style={styles.item}>{data.text}</Text>
-            <View key ={i} style={data.isCompleted == 0 ?styles.itemView:styles.itemViewCompleted}>
-                <RadioButton
-                    value="first"
-                    color={Colors.cyan500}
-                    uncheckedColor={Colors.purple800}
-                    status={ data.isCompleted == 1 ? 'checked' : 'unchecked' }
-                    onPress={() => {taskCompleted(i);}}
-                    style={{alignItems:"flex-start",color:"red"}}
-                    key={1000+i}
-                />
-                <Text key={data.id} numberOfLines={1} style={data.isCompleted == 0 ?styles.item:styles.itemCompleted}>{data.text}</Text>
-                
-                <IconButton
-                    icon="delete"
-                    color={Colors.red500}
-                    size={20}
-                    onPress={() => {removeItemFromList(i);}}
-                    style={{alignItems:"flex-end"}}
-                    key={i+2000}
-                />
-            </View>
-          );
+            items.map((data,i)=>{
+            return( 
+              <View key ={i} style={data.isCompleted == 0 ?styles.itemView:styles.itemViewCompleted}>
+                  <RadioButton
+                      value="first"
+                      color={Colors.cyan500}
+                      uncheckedColor={Colors.purple800}
+                      status={ data.isCompleted == 1 ? 'checked' : 'unchecked' }
+                      onPress={() => {taskCompleted(i);}}
+                      style={{alignItems:"flex-start",color:"red"}}
+                      key={1000+i}
+                  />
+                  <Text key={data.id} numberOfLines={1} style={data.isCompleted == 0 ?styles.item:styles.itemCompleted}>{data.text}</Text>
+                  <IconButton
+                      icon="delete"
+                      color={Colors.red500}
+                      size={20}
+                      onPress={() => {removeItemFromList(i);}}
+                      style={{alignItems:"flex-end"}}
+                      key={i+2000}
+                  />
+              </View>
+            );
         })}    
       </ScrollView>
       <StatusBar style="inverted" hidden={false} />
@@ -296,10 +317,8 @@ const styles = StyleSheet.create({
     padding:10,
     paddingTop: Constants.statusBarHeight,
     flexDirection:"column",
-    backgroundColor: '#0D1117',
-    
+    backgroundColor: '#0D1117', 
     zIndex:0,
-    //justifyContent: 'center',
     color:'#fff',
   },
   addItem: {
@@ -330,7 +349,6 @@ const styles = StyleSheet.create({
     padding:20,
     width:'100%',
     flexDirection:"column",
-    //backgroundColor: '#2E2E2E',
     borderColor:"grey",
     borderRadius:5,
     marginBottom:5,
@@ -401,7 +419,3 @@ const styles = StyleSheet.create({
     width:"100%",
   }
 });
-
-AppRegistry.registerComponent('Todo-list-app', () => 'App');
-
-export default App;
